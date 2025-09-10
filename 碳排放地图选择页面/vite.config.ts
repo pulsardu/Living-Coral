@@ -14,7 +14,9 @@
     build: {
       target: 'esnext',
       outDir: 'build',
+      assetsDir: 'assets',
     },
+    base: './', // 使用相对路径，这样可以直接打开HTML文件
     server: {
       port: 3000,
       open: true,
