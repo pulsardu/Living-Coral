@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 
 // Types
@@ -24,12 +24,13 @@ interface Location {
   icon: string;
 }
 
-type AppPage = 'location' | 'transport' | 'navigation';
+type AppPage = 'location' | 'transport' | 'sydney-transport' | 'navigation';
 
 // Location Constants
 const LOCATIONS: Location[] = [
   { id: 'uq-lake', name: 'UQ Lake', icon: '🏞️' },
-  { id: 'city-hall', name: 'City Hall', icon: '🏛️' }
+  { id: 'city-hall', name: 'City Hall', icon: '🏛️' },
+  { id: 'sydney-opera', name: 'Sydney Opera House', icon: '🎭' }
 ];
 
 // Constants
@@ -42,15 +43,15 @@ const TRANSPORT_MODES: Record<string, TransportMode> = {
     routes: [
       {
         name: 'Recommended Route',
-        time: '45 min',
-        distance: '3.2 km',
+        time: '64 min',
+        distance: '4.7 km',
         co2: '0g CO₂',
         isRecommended: true
       },
       {
-        name: 'Shortest Route',
-        time: '38 min',
-        distance: '2.8 km',
+        name: 'Alternative Route',
+        time: '67 min',
+        distance: '4.9 km',
         co2: '0g CO₂',
         isRecommended: false
       }
@@ -59,21 +60,43 @@ const TRANSPORT_MODES: Record<string, TransportMode> = {
   cycling: {
     name: 'Cycling',
     icon: '🚴',
-    co2: '15g CO₂',
+    co2: '0g CO₂',
     color: '#3b82f6',
     routes: [
       {
         name: 'Recommended Route',
-        time: '25 min',
-        distance: '4.1 km',
-        co2: '15g CO₂',
+        time: '22 min',
+        distance: '6.4 km',
+        co2: '0g CO₂',
         isRecommended: true
       },
       {
         name: 'Direct Route',
         time: '20 min',
-        distance: '3.5 km',
-        co2: '15g CO₂',
+        distance: '5.5 km',
+        co2: '0g CO₂',
+        isRecommended: false
+      }
+    ]
+  },
+  driving: {
+    name: 'Driving',
+    icon: '🚗',
+    co2: '1200g CO₂',
+    color: '#ef4444',
+    routes: [
+      {
+        name: 'Recommended Route',
+        time: '11 min',
+        distance: '6.1 km',
+        co2: '1200g CO₂',
+        isRecommended: true
+      },
+      {
+        name: 'Alternative Route',
+        time: '11 min',
+        distance: '6.3 km',
+        co2: '1260g CO₂',
         isRecommended: false
       }
     ]
@@ -81,21 +104,21 @@ const TRANSPORT_MODES: Record<string, TransportMode> = {
   bus: {
     name: 'Bus',
     icon: '🚌',
-    co2: '120g CO₂',
+    co2: '630g CO₂',
     color: '#f59e0b',
     routes: [
       {
         name: 'Recommended Route',
-        time: '35 min',
-        distance: '5.2 km',
-        co2: '120g CO₂',
+        time: '22 min',
+        distance: '6.3 km',
+        co2: '630g CO₂',
         isRecommended: true
       },
       {
-        name: 'Local Route',
-        time: '45 min',
-        distance: '4.8 km',
-        co2: '120g CO₂',
+        name: 'Fast Route',
+        time: '18 min',
+        distance: '7.5 km',
+        co2: '750g CO₂',
         isRecommended: false
       }
     ]
@@ -103,22 +126,115 @@ const TRANSPORT_MODES: Record<string, TransportMode> = {
   train: {
     name: 'Train',
     icon: '🚇',
-    co2: '85g CO₂',
+    co2: '450g CO₂',
     color: '#8b5cf6',
     routes: [
       {
         name: 'Recommended Route',
-        time: '28 min',
-        distance: '6.1 km',
-        co2: '85g CO₂',
+        time: '41 min',
+        distance: '7.5 km',
+        co2: '450g CO₂',
         isRecommended: true
       },
       {
         name: 'Alternative Route',
-        time: '32 min',
-        distance: '5.8 km',
-        co2: '85g CO₂',
+        time: '47 min',
+        distance: '7.5 km',
+        co2: '450g CO₂',
         isRecommended: false
+      }
+    ]
+  },
+  plane: {
+    name: 'Plane',
+    icon: '✈️',
+    co2: '-',
+    color: '#06b6d4',
+    routes: []
+  }
+};
+
+// Sydney Routes (City Hall to Sydney Opera House)
+const SYDNEY_TRANSPORT_MODES: Record<string, TransportMode> = {
+  walking: {
+    name: 'Walking',
+    icon: '🚶',
+    co2: '0g CO₂',
+    color: '#22c55e',
+    routes: [
+      {
+        name: 'Recommended Route',
+        time: '8 days 13 hours',
+        distance: '907 km',
+        co2: '0g CO₂',
+        isRecommended: true
+      }
+    ]
+  },
+  cycling: {
+    name: 'Cycling',
+    icon: '🚴',
+    co2: '0g CO₂',
+    color: '#3b82f6',
+    routes: [
+      {
+        name: 'Recommended Route',
+        time: '2 days 9 hours',
+        distance: '1060 km',
+        co2: '0g CO₂',
+        isRecommended: true
+      }
+    ]
+  },
+  bus: {
+    name: 'Bus',
+    icon: '🚌',
+    co2: '-',
+    color: '#f59e0b',
+    routes: []
+  },
+  train: {
+    name: 'Train',
+    icon: '🚇',
+    co2: '46kg CO₂',
+    color: '#8b5cf6',
+    routes: [
+      {
+        name: 'Recommended Route',
+        time: '14 hours 43 min',
+        distance: '920 km',
+        co2: '46kg CO₂',
+        isRecommended: true
+      }
+    ]
+  },
+  driving: {
+    name: 'Driving',
+    icon: '🚗',
+    co2: '193kg CO₂',
+    color: '#ef4444',
+    routes: [
+      {
+        name: 'Recommended Route',
+        time: '11 hours 51 min',
+        distance: '963 km',
+        co2: '193kg CO₂',
+        isRecommended: true
+      }
+    ]
+  },
+  plane: {
+    name: 'Plane',
+    icon: '✈️',
+    co2: '240kg CO₂',
+    color: '#06b6d4',
+    routes: [
+      {
+        name: 'Recommended Route',
+        time: '1 hour 30 min',
+        distance: '907 km',
+        co2: '240kg CO₂',
+        isRecommended: true
       }
     ]
   }
@@ -209,12 +325,29 @@ function App() {
   const [fromLocation, setFromLocation] = useState<string>('');
   const [toLocation, setToLocation] = useState<string>('');
   
-  const currentMode = TRANSPORT_MODES[selectedMode];
-  const currentRoute = currentMode.routes[selectedRoute];
+  const currentMode = currentPage === 'sydney-transport' ? SYDNEY_TRANSPORT_MODES[selectedMode] : TRANSPORT_MODES[selectedMode];
+  const currentRoute = currentMode.routes && currentMode.routes.length > 0 
+    ? (currentMode.routes[selectedRoute] || currentMode.routes[0])
+    : null;
+  
+  // Reset selected route when mode changes and current route is not available
+  useEffect(() => {
+    if (currentMode.routes.length > 0 && selectedRoute >= currentMode.routes.length) {
+      setSelectedRoute(0);
+    } else if (currentMode.routes.length === 0) {
+      // If no routes available, reset to 0
+      setSelectedRoute(0);
+    }
+  }, [selectedMode, currentMode.routes.length, selectedRoute]);
   
   const handleLocationSubmit = () => {
     if (fromLocation && toLocation) {
-      setCurrentPage('transport');
+      // Check if either location is Sydney Opera House
+      if (fromLocation === 'sydney-opera' || toLocation === 'sydney-opera') {
+        setCurrentPage('sydney-transport');
+      } else {
+        setCurrentPage('transport');
+      }
     }
   };
   
@@ -223,7 +356,11 @@ function App() {
   };
   
   const handleBackToTransport = () => {
-    setCurrentPage('transport');
+    if (fromLocation === 'sydney-opera' || toLocation === 'sydney-opera') {
+      setCurrentPage('sydney-transport');
+    } else {
+      setCurrentPage('transport');
+    }
   };
   
   const handleStartNavigation = () => {
@@ -239,8 +376,8 @@ function App() {
     <div className="app">
       <header className="app-header">
         <h1>Transportation Planning</h1>
-        {(currentPage === 'transport' || currentPage === 'navigation') && (
-          <button className="back-button-top" onClick={currentPage === 'transport' ? handleBackToLocation : handleBackToTransport}>
+        {(currentPage === 'transport' || currentPage === 'sydney-transport' || currentPage === 'navigation') && (
+          <button className="back-button-top" onClick={currentPage === 'navigation' ? handleBackToTransport : handleBackToLocation}>
             ← Back
           </button>
         )}
@@ -279,7 +416,7 @@ function App() {
               Continue to Transport Options
             </button>
           </div>
-        ) : currentPage === 'transport' ? (
+        ) : currentPage === 'transport' || currentPage === 'sydney-transport' ? (
           <div className="transport-page">
             <div className="route-info">
               <span className="route-text">
@@ -290,36 +427,75 @@ function App() {
             <section className="transport-modes">
               <h2>Transportation Modes</h2>
               <div className="modes-grid">
-                {Object.entries(TRANSPORT_MODES).map(([key, mode]) => (
-                  <TransportModeCard
-                    key={key}
-                    mode={mode}
-                    isSelected={selectedMode === key}
-                    onClick={() => setSelectedMode(key)}
-                  />
-                ))}
+                {/* 第一行：走路-自行车 */}
+                <TransportModeCard
+                  key="walking"
+                  mode={currentPage === 'sydney-transport' ? SYDNEY_TRANSPORT_MODES.walking : TRANSPORT_MODES.walking}
+                  isSelected={selectedMode === 'walking'}
+                  onClick={() => setSelectedMode('walking')}
+                />
+                <TransportModeCard
+                  key="cycling"
+                  mode={currentPage === 'sydney-transport' ? SYDNEY_TRANSPORT_MODES.cycling : TRANSPORT_MODES.cycling}
+                  isSelected={selectedMode === 'cycling'}
+                  onClick={() => setSelectedMode('cycling')}
+                />
+                {/* 第二行：开车-公交车 */}
+                <TransportModeCard
+                  key="driving"
+                  mode={currentPage === 'sydney-transport' ? SYDNEY_TRANSPORT_MODES.driving : TRANSPORT_MODES.driving}
+                  isSelected={selectedMode === 'driving'}
+                  onClick={() => setSelectedMode('driving')}
+                />
+                <TransportModeCard
+                  key="bus"
+                  mode={currentPage === 'sydney-transport' ? SYDNEY_TRANSPORT_MODES.bus : TRANSPORT_MODES.bus}
+                  isSelected={selectedMode === 'bus'}
+                  onClick={() => setSelectedMode('bus')}
+                />
+                {/* 第三行：火车-飞机 */}
+                <TransportModeCard
+                  key="train"
+                  mode={currentPage === 'sydney-transport' ? SYDNEY_TRANSPORT_MODES.train : TRANSPORT_MODES.train}
+                  isSelected={selectedMode === 'train'}
+                  onClick={() => setSelectedMode('train')}
+                />
+                <TransportModeCard
+                  key="plane"
+                  mode={currentPage === 'sydney-transport' ? SYDNEY_TRANSPORT_MODES.plane : TRANSPORT_MODES.plane}
+                  isSelected={selectedMode === 'plane'}
+                  onClick={() => setSelectedMode('plane')}
+                />
               </div>
             </section>
             
             <section className="routes-section">
               <h2>{currentMode.name} Routes</h2>
               <div className="routes-list">
-                {currentMode.routes.map((route, index) => (
-                  <RouteCard
-                    key={index}
-                    route={route}
-                    modeColor={currentMode.color}
-                    isRecommended={route.isRecommended}
-                    isSelected={selectedRoute === index}
-                    onClick={() => setSelectedRoute(index)}
-                  />
-                ))}
+                {currentMode.routes.length > 0 ? (
+                  currentMode.routes.map((route, index) => (
+                    <RouteCard
+                      key={index}
+                      route={route}
+                      modeColor={currentMode.color}
+                      isRecommended={route.isRecommended}
+                      isSelected={selectedRoute === index}
+                      onClick={() => setSelectedRoute(index)}
+                    />
+                  ))
+                ) : (
+                  <div className="no-routes-message">
+                    <div className="no-routes-icon">🚫</div>
+                    <div className="no-routes-text">Unable to find routes to this destination</div>
+                  </div>
+                )}
               </div>
             </section>
             
             <button 
               className="start-navigation-button"
               onClick={handleStartNavigation}
+              disabled={currentMode.routes.length === 0}
             >
               Start Navigation
             </button>
@@ -340,21 +516,28 @@ function App() {
             
             <div className="map-container">
               <img 
-                src="/map_image.PNG" 
+                src={fromLocation === 'sydney-opera' || toLocation === 'sydney-opera' ? "/img_2452.PNG" : "/map_image.PNG"}
                 alt="Navigation Map" 
                 className="navigation-map"
               />
             </div>
             
             <div className="navigation-info">
-              <div className="current-route">
-                <h3>{currentRoute.name}</h3>
-                <div className="route-stats">
-                  <span>⏱️ {currentRoute.time}</span>
-                  <span>📍 {currentRoute.distance}</span>
-                  <span className="co2-emission">🌱 {currentRoute.co2}</span>
+              {currentRoute ? (
+                <div className="current-route">
+                  <h3>{currentRoute.name}</h3>
+                  <div className="route-stats">
+                    <span>⏱️ {currentRoute.time}</span>
+                    <span>📍 {currentRoute.distance}</span>
+                    <span className="co2-emission">🌱 {currentRoute.co2}</span>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className="no-route-info">
+                  <h3>No route available</h3>
+                  <p>Please select a different transportation mode</p>
+                </div>
+              )}
             </div>
           </div>
         )}

@@ -1,97 +1,120 @@
 # Transportation Planner
 
-A modern, responsive web application for planning transportation routes with real-time carbon emission tracking. Built with React, TypeScript, and Vite.
+A modern transportation planning app with carbon emission tracking, supporting both local and long-distance routes.
 
 ## Features
 
-- 🚶 **Multiple Transport Modes**: Walking, Cycling, Bus, and Train options
-- 🌱 **Carbon Emission Tracking**: Real-time CO₂ calculations for each route
-- 📱 **Responsive Design**: Optimized for desktop and mobile devices
-- ⚡ **Fast Performance**: Built with Vite for lightning-fast development and builds
-- 🎨 **Modern UI**: Clean, intuitive interface with smooth animations
+- **Location Selection**: Choose from UQ Lake, City Hall, and Sydney Opera House
+- **Transportation Modes**: Walking, Cycling, Driving, Bus, Train, and Plane
+- **Route Planning**: 
+  - Local routes (UQ Lake ↔ City Hall)
+  - Long-distance routes (any route involving Sydney Opera House)
+- **Carbon Emission Tracking**: Real-time CO₂ emission calculations
+- **Interactive Navigation**: Visual route display with maps
 
-## Tech Stack
+## Quick Start
 
-- **Frontend**: React 18 + TypeScript
-- **Build Tool**: Vite 6
-- **Styling**: CSS3 with CSS Variables
-- **Development**: Hot Module Replacement (HMR)
+### Option 1: Production Build (Recommended)
 
-## Getting Started
-
-### Prerequisites
-
-- Node.js 18+ 
-- npm or yarn
-
-### Installation
-
-1. Clone the repository:
-```bash
-git clone <repository-url>
-cd transportation-planner
+**For Windows:**
+```cmd
+start-server.bat
 ```
 
-2. Install dependencies:
+**For macOS/Linux:**
 ```bash
-npm install
+chmod +x start-server.sh
+./start-server.sh
 ```
 
-3. Start the development server:
-```bash
-npm run dev
+Then open your browser and visit: `http://localhost:8080`
+
+### Option 2: Development Mode
+
+**For Windows:**
+```cmd
+run.bat
 ```
 
-4. Open your browser and visit `http://localhost:3000`
+**For macOS/Linux:**
+```bash
+chmod +x run.sh
+./run.sh
+```
 
-### Available Scripts
+Then open your browser and visit: `http://localhost:3001`
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
+## Requirements
+
+- **Node.js** (v16 or higher) - [Download](https://nodejs.org/)
+- **Python 3** (for production server) - [Download](https://www.python.org/downloads/)
 
 ## Project Structure
 
 ```
-src/
-├── App.tsx          # Main application component
-├── App.css          # Application styles
-├── main.tsx         # Application entry point
-├── index.css        # Global styles
-└── styles/
-    └── globals.css  # Additional global styles
+├── src/
+│   ├── App.tsx          # Main application component
+│   ├── App.css          # Application styles
+│   └── main.tsx         # Application entry point
+├── public/
+│   ├── map_image.PNG    # Local route map
+│   └── img_2452.PNG     # Sydney route map
+├── build/               # Production build output
+├── run.bat/.sh          # Development server scripts
+├── start-server.bat/.sh # Production server scripts
+└── package.json         # Project dependencies
 ```
 
-## Features Overview
+## Route Types
 
-### Transport Mode Selection
-Choose from four different transportation modes, each with their own carbon footprint:
-- **Walking**: 0g CO₂ - Most eco-friendly option
-- **Cycling**: 15g CO₂ - Great balance of speed and sustainability  
-- **Bus**: 120g CO₂ - Public transportation option
-- **Train**: 85g CO₂ - Fast and relatively eco-friendly
+### Local Routes
+- **UQ Lake ↔ City Hall**
+- Uses `map_image.PNG` for navigation
+- Short distances and times
 
-### Route Planning
-Each transport mode offers multiple route options:
-- Recommended routes (marked with ⭐)
-- Alternative routes for flexibility
-- Detailed time and distance information
-- Real-time carbon emission calculations
+### Long-Distance Routes
+- **Any route involving Sydney Opera House**
+- Uses `img_2452.PNG` for navigation
+- Extended travel times and distances
+- Higher CO₂ emissions
 
-## Contributing
+## Transportation Modes
 
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+| Mode | Local CO₂ | Sydney CO₂ | Notes |
+|------|-----------|------------|-------|
+| Walking | 0g | 0g | Most eco-friendly |
+| Cycling | 0g | 0g | Zero emissions |
+| Driving | 1200g | 193kg | Highest local emissions |
+| Bus | 630g | - | No Sydney routes |
+| Train | 450g | 46kg | Good for long distances |
+| Plane | - | 240kg | Fastest for Sydney |
+
+## Troubleshooting
+
+### Port Already in Use
+If you get "Address already in use" error:
+- **Windows**: Close any running Python processes
+- **macOS/Linux**: Run `pkill -f "python.*http.server"`
+
+### Build Issues
+If the build fails:
+1. Make sure Node.js is installed
+2. Run `npm install` to install dependencies
+3. Try `npm run build` manually
+
+### Missing Images
+If maps don't display:
+- Check that `public/map_image.PNG` and `public/img_2452.PNG` exist
+- Rebuild the project with `npm run build`
+
+## Development
+
+To modify the application:
+1. Edit files in `src/` directory
+2. Use development mode (`run.bat` or `run.sh`)
+3. Changes will auto-reload in the browser
+4. Build for production when ready (`npm run build`)
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Acknowledgments
-
-- Built with modern web technologies
-- Inspired by sustainable transportation initiatives
-- Designed for accessibility and user experience
+MIT License - Transportation Planner Team

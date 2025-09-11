@@ -80,6 +80,7 @@
 .modes-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr 1fr;
   gap: 12px;
 }
 
@@ -126,6 +127,31 @@
 /* Routes Section */
 .routes-section {
   margin-bottom: 24px;
+}
+
+/* No Routes Message */
+.no-routes-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  background-color: #f9fafb;
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.no-routes-icon {
+  font-size: 2rem;
+  margin-bottom: 12px;
+  opacity: 0.6;
+}
+
+.no-routes-text {
+  font-size: 1rem;
+  color: #6b7280;
+  font-weight: 500;
 }
 
 .routes-section h2 {
@@ -338,9 +364,17 @@
   margin-top: 8px;
 }
 
-.start-navigation-button:hover {
+.start-navigation-button:hover:not(:disabled) {
   transform: translateY(-1px);
   box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+}
+
+.start-navigation-button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  opacity: 0.6;
 }
 
 /* Navigation Page */
